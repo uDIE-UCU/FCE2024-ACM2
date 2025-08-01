@@ -1,0 +1,41 @@
+** sch_path: /workspaces/usm-vlsi-tools/shared_xserver/Parametros_Vaf/VTH_tets.sch
+**.subckt VTH_tets
+N1 Vd Vg GND GND NMOS_ACM w={w} l={l} m=1
+V1 Vg GND {Vg}
+V2 Vd GND DC({phi_t*0.5})
+**** begin user architecture code
+
+
+* Circuit Parameters
+.param vg = 2
+.param step = 0.5
+.param phi_t = 0.0258
+.param w = 5u
+.param l = 0.18u
+* Include Models
+.model NMOS_ACM nmos_ACM
+.model PMOS_ACM pmos_ACM
+* OP Parameters & Singals to save
+.save all
+.save @n1[gm_op]
+*Simulations
+.dc V1 0 {vg} {step}
+.control
+pre_osdi NMOS_ACM_2V0.osdi
+pre_osdi PMOS_ACM_2V0.osdi
+run
+let gm = @n1[gm_op]
+let gm_id = deriv(-1*i(V2))/(-1*i(V2))
+show n1
+setplot dc1
+gnuplot gm_id @n1[gm_op]
+set filetype = ascii
+write dcsweep.raw
+.endc
+.end
+
+
+**** end user architecture code
+**.ends
+.GLOBAL GND
+.end

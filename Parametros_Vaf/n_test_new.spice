@@ -1,0 +1,39 @@
+** sch_path: /workspaces/usm-vlsi-tools/shared_xserver/Parametros_Vaf/n_test.sch
+**.subckt n_test
+V1 Vs GND {vs}
+V2 net1 GND {Vdd}
+I0 net1 Vg {is}
+N1 Vg Vg Vs GND NMOS_ACM w={w} l={l} m=1
+**** begin user architecture code
+
+
+* Circuit Parameters
+.param vs = 3
+.param step = 0.5
+.param Vdd = 1.2
+.param is = 173.49340939147848u
+.param w = 5u
+.param l = 0.18u
+* Include Models
+.model NMOS_ACM nmos_ACM
+.model PMOS_ACM pmos_ACM
+* OP Parameters & Singals to save
+.save all
+*Simulations
+.dc V1 -1 {vs} {step}
+.control
+pre_osdi NMOS_ACM_2V0.osdi
+pre_osdi PMOS_ACM_2V0.osdi
+run
+setplot dc1
+gnuplot v(Vg)
+set filetype = ascii
+write dcsweep.raw
+.endc
+.end
+
+
+**** end user architecture code
+**.ends
+.GLOBAL GND
+.end
