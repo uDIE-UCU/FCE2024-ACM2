@@ -1,15 +1,17 @@
-** sch_path: /workspaces/usm-vlsi-tools/shared_xserver/Parametros_Vaf/VTH_tets.sch
-**.subckt VTH_tets
+** sch_path: /workspaces/usm-vlsi-tools/shared_xserver/Parametros_Vaf/sigma_test.sch
+**.subckt sigma_test
 N1 Vd Vg GND GND NMOS_ACM w={w} l={l} m=1
-V1 Vg GND {Vg}
-V2 Vd GND DC({phi_t*0.5})
+E1 Vg GND Vd net1 1000
+I0 Vdd Vd 3m
+V1 net1 GND 3
+V2 Vdd GND {vdd}
 **** begin user architecture code
 
 
 * Circuit Parameters
-.param vg = 3
+.param vd = 3
+.param vdd = 1.2
 .param step = 0.01
-.param phi_t = 0.0258
 .param w = 5.0u
 .param l = 0.18u
 * Include Models
@@ -18,15 +20,16 @@ V2 Vd GND DC({phi_t*0.5})
 * OP Parameters & Singals to save
 .save all
 .save @n1[gm_op]
+.save @n1[gmd_op]
 *Simulations
-.dc V1 0 {vg} {step}
+.dc V1 0 {vd} {step}
 .control
 pre_osdi NMOS_ACM_2V0.osdi
 pre_osdi PMOS_ACM_2V0.osdi
 run
-let gm_id = deriv(-1*i(V2))/(-1*i(V2))
 setplot dc1
-plot gm_id
+plot @n1[gm_op] @n1[gmd_op]
+let sigma = @n1[gmd_op]/@n1[gm_op]
 set filetype = ascii
 write dcsweep.raw
 .endc

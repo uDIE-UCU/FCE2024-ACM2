@@ -48,6 +48,7 @@ value="
 .model PMOS_ACM pmos_ACM
 * OP Parameters & Singals to save
 .save all
+.save @n1[gm_op]
 *Simulations
 .dc V1 0 \{vg\} \{step\}
 .control

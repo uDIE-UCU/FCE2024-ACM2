@@ -54,6 +54,7 @@ value="
 * Circuit Parameters
 .param vd = 3
 .param vdd = 1.2
+.param Ibias = 1m
 .param step = 0.01
 .param w = 5.0u
 .param l = 0.18u
@@ -62,15 +63,17 @@ value="
 .model PMOS_ACM pmos_ACM
 * OP Parameters & Singals to save
 .save all
+.save @n1[gm_op]
+.save @n1[gmd_op]
 *Simulations
-.dc V1 0 \{vg\} \{step\}
+.dc V1 0 \{vd\} \{step\}
 .control
 pre_osdi NMOS_ACM_2V0.osdi
 pre_osdi PMOS_ACM_2V0.osdi
 run
-let gm_id = deriv(-1*i(V2))/(-1*i(V2))
 setplot dc1
-plot gm_id
+plot @n1[gm_op] @n1[gmd_op]
+let sigma = @n1[gmd_op]/@n1[gm_op]
 set filetype = ascii
 write dcsweep.raw
 .endc
@@ -80,8 +83,8 @@ C {nmos4.sym} -50 -10 0 1 {name=N1 model=NMOS_ACM w=\{w\} l=\{l\} del=0 m=1}
 C {lab_pin.sym} -70 -50 0 0 {name=p1 sig_type=std_logic lab=Vd}
 C {lab_pin.sym} -20 -40 0 0 {name=p2 sig_type=std_logic lab=Vg}
 C {gnd.sym} -70 70 0 0 {name=l1 lab=GND}
-C {vcvs.sym} 20 -10 3 1 {name=E1 value=100}
-C {isource.sym} -70 -100 0 0 {name=I0 value=1m}
+C {vcvs.sym} 20 -10 3 1 {name=E1 value=1000}
+C {isource.sym} -70 -100 0 0 {name=I0 value=\{Ibias\}}
 C {lab_pin.sym} -140 -150 0 0 {name=p3 sig_type=std_logic lab=Vdd}
-C {vsource.sym} 90 20 0 0 {name=V1 value=3 savecurrent=false}
+C {vsource.sym} 90 20 0 0 {name=V1 value=\{vd\} savecurrent=false}
 C {vsource.sym} -140 20 0 0 {name=V2 value=\{vdd\} savecurrent=false}
