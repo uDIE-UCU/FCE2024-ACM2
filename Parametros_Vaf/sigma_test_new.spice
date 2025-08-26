@@ -2,18 +2,19 @@
 **.subckt sigma_test
 N1 Vd Vg GND GND NMOS_ACM w={w} l={l} m=1
 E1 Vg GND Vd net1 1000
-I0 Vdd Vd 3m
-V1 net1 GND 3
+I0 Vdd Vd {Ibias}
+V1 net1 GND {vd}
 V2 Vdd GND {vdd}
 **** begin user architecture code
 
 
 * Circuit Parameters
-.param vd = 3
+.param vd = 3.0
 .param vdd = 1.2
+.param Ibias = 1.0m
 .param step = 0.01
-.param w = 5.0u
-.param l = 0.18u
+.param w = 1.0u
+.param l = 1.0u
 * Include Models
 .model NMOS_ACM nmos_ACM
 .model PMOS_ACM pmos_ACM
@@ -31,7 +32,7 @@ setplot dc1
 gnuplot @n1[gm_op] @n1[gmd_op]
 let sigma = @n1[gmd_op]/@n1[gm_op]
 set filetype = ascii
-write dcsweep.raw
+write sigma_sweep.raw
 .endc
 .end
 

@@ -5,12 +5,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def run_spice(og_path, dest_path, og_params, dest_params, verbose=False):
+def run_spice(og_path, dest_path, og_params, dest_params, dcname, verbose=False):
     with open(og_path, "r") as f:
         spice_content = f.read()
         spice_content = spice_content.replace(og_params, dest_params)
         spice_content = spice_content.replace("plot", "gnuplot", 2)
         spice_content = spice_content.replace("gnuplot", "plot", 1)
+        spice_content = spice_content.replace("dcsweep", dcname)
     with open(dest_path, "w") as f:
         f.write(spice_content)
 
@@ -40,6 +41,24 @@ def find_nearest(array, value):
     array = np.asarray(array)
     idx = (np.abs(array - value)).argmin()
     return array[idx], idx
+
+
+def find_nearest_2(array_x, array_y, value_y):
+    if len(array_y) == len(array_x):
+        idx = find_nearest(array_y, value_y)[1]
+        if np.abs(value_y - array_y[idx - 1]) > np.abs(value_y - array_y[idx - 1]):
+            idx_start, idx_end = idx + 1, idx
+        else:
+            idx_start, idx_end = idx, idx - 1
+        value_diff = value_y - array_y[idx_start]
+        linear_diff = array_y[idx_end] - array_y[idx_start]
+        value_x = array_x[idx_start] + (array_x[idx_end] - array_x[idx_start]) * (
+            value_diff / linear_diff
+        )
+        return value_x
+    else:
+        print("arrays must be of same length")
+        return 0
 
 
 def solve_qs(Vdd, Vth, sigma, n, phi_t):
@@ -76,10 +95,10 @@ def ex_param(
     og_params_VTH = ".param vg = 3\n.param step = 0.01\n.param phi_t = 0.0258\n.param w = 5.0u\n.param l = 0.18u"
     dest_params_VTH = f".param vg = {Vg_max}\n.param step = {step}\n.param phi_t = {phi_t}\n.param w = {w}u\n.param l = {l}u"
 
-    run_spice(og_path_VTH, dest_path_VTH, og_params_VTH, dest_params_VTH)
+    run_spice(og_path_VTH, dest_path_VTH, og_params_VTH, dest_params_VTH, "VTH_sweep")
 
     # Load the raw file
-    data_vth = spyci.load_raw("dcsweep.raw")
+    data_vth = spyci.load_raw("VTH_sweep.raw")
 
     gm_vaf = np.array(get_values(data_vth, "@n1[gm_op]"))
     Vg = np.array(get_values(data_vth, "v(vg)"))
@@ -91,8 +110,8 @@ def ex_param(
     gm_Id_vaf_max = max(gm_Id_vaf)
     nearest_vaf, idx_vaf = find_nearest(gm_Id_vaf, gm_Id_vaf_max / 2)
     err_Vth_vaf = abs(gm_Id_vaf_max / 2 - nearest_vaf)
-    Vth_vaf = Vg[idx_vaf]
-    Ish_vaf = Id[idx_vaf] / S
+    Vth_vaf = find_nearest_2(Vg, gm_Id_vaf, gm_Id_vaf_max / 2)  # Vg[idx_vaf]
+    Ish_vaf = find_nearest_2(Id, gm_Id_vaf, gm_Id_vaf_max / 2) / S  # Id[idx_vaf] / S
     Is_vaf = 3 * Ish_vaf.real * S * np.power(10, 6)
     Is_list = [Is_vaf]
     if graph:
@@ -105,8 +124,10 @@ def ex_param(
         gm_Id_ngs_max = max(gm_Id_ngs)
         nearest_ngs, idx_ngs = find_nearest(gm_Id_ngs, gm_Id_ngs_max / 2)
         err_Vth_ngs = abs(gm_Id_ngs_max / 2 - nearest_ngs)
-        Vth_ngs = Vg[idx_ngs]
-        Ish_ngs = Id[idx_ngs] / S
+        Vth_ngs = find_nearest_2(Vg, gm_Id_ngs, gm_Id_ngs_max / 2)  # Vg[idx_ngs]
+        Ish_ngs = (
+            find_nearest_2(Id, gm_Id_ngs, gm_Id_ngs_max / 2) / S
+        )  # Id[idx_ngs] / S
         Is_ngs = 3 * Ish_ngs.real * S * np.power(10, 6)
         Is_list.append(Is_ngs)
         if graph:
@@ -120,8 +141,8 @@ def ex_param(
         gm_Id_max = max(gm_Id)
         nearest, idx = find_nearest(gm_Id, gm_Id_max / 2)
         err_Vth = abs(gm_Id_max / 2 - nearest)
-        Vth = Vg[idx]
-        Ish = Id[idx] / S
+        Vth = find_nearest_2(Vg[1:], gm_Id, gm_Id_max / 2)  # Vg[idx]
+        Ish = find_nearest_2(Id[1:], gm_Id, gm_Id_max / 2) / S  # Id[idx] / S
         Is = 3 * Ish.real * S * np.power(10, 6)
         Is_list.append(Is)
         if graph:
@@ -138,9 +159,9 @@ def ex_param(
         og_params_n = ".param vs = 3\n.param step = 0.01\n.param Vdd = 1.8\n.param is = 0.173u\n.param w = 5.0u\n.param l = 0.18u"
         dest_params_n = f".param vs = {Vs_max}\n.param step = {step}\n.param Vdd = {Vdd}\n.param is = {i}u\n.param w = {w}u\n.param l = {l}u"
 
-        run_spice(og_path_n, dest_path_n, og_params_n, dest_params_n)
+        run_spice(og_path_n, dest_path_n, og_params_n, dest_params_n, "n_sweep")
 
-        data_n = spyci.load_raw("dcsweep.raw")
+        data_n = spyci.load_raw("n_sweep.raw")
 
         Vs = np.array(get_values(data_n, "v(vs)"))
         Vg_n = np.array(get_values(data_n, "v(vg)"))
@@ -158,9 +179,15 @@ def ex_param(
     og_params_sigma = ".param vd = 3\n.param vdd = 1.2\n.param Ibias = 1m\n.param step = 0.01\n.param w = 5.0u\n.param l = 0.18u"
     dest_params_sigma = f".param vd = {Vd_max}\n.param vdd = {Vdd}\n.param Ibias = {Ibias}m\n.param step = {step}\n.param w = {w}u\n.param l = {l}u"
 
-    run_spice(og_path_sigma, dest_path_sigma, og_params_sigma, dest_params_sigma)
+    run_spice(
+        og_path_sigma,
+        dest_path_sigma,
+        og_params_sigma,
+        dest_params_sigma,
+        "sigma_sweep",
+    )
 
-    data_sigma = spyci.load_raw("dcsweep.raw")
+    data_sigma = spyci.load_raw("sigma_sweep.raw")
     sigma_graph = np.array(get_values(data_sigma, "sigma"))
     Vd = np.array(get_values(data_sigma, "v(v-sweep)"))
     sigma = sigma_graph[-1].real
@@ -172,13 +199,11 @@ def ex_param(
     og_params_zeta = ".param vdd = 1.2\n.param w = 5.0u\n.param l = 0.18u"
     dest_params_zeta = f".param vdd = {Vdd}\n.param w = {w}u\n.param l = {l}u"
 
-    run_spice(og_path_zeta, dest_path_zeta, og_params_zeta, dest_params_zeta)
-    data_zeta = spyci.load_raw("dcsweep.raw")
+    run_spice(og_path_zeta, dest_path_zeta, og_params_zeta, dest_params_zeta, "zeta_op")
+    data_zeta = spyci.load_raw("zeta_op.raw")
     id = get_values(data_zeta, "i(vd)")[0].real
     qs = solve_qs(Vdd, Vth_vaf.real, sigma, n_tuple[0].real, phi_t)
-    print(qs)
-    print(id / Ish_vaf.real)
-    zeta = solve_zeta(qs, id, Ish_vaf.real)
+    zeta = solve_zeta(qs, id, Ish_vaf.real).real
 
     if graph:
         print(f"zeta={zeta}")
@@ -201,7 +226,7 @@ def ex_param(
             output += (Vth.real, Ish.real, n_tuple[2])
     if hand and not spice:
         output += (Vth.real, Ish.real, n_tuple[1])
-    output += (sigma, zeta)
+    output += (sigma, zeta, Id, Vg)
     return output
 
 

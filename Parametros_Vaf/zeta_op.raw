@@ -1,5 +1,5 @@
 Title: ** sch_path: /workspaces/usm-vlsi-tools/shared_xserver/parametros_vaf/zeta_test.sch
-Date: Mon Aug  4 22:27:07  2025
+Date: Tue Aug 26 18:55:57  2025
 Plotname: Operating Point
 Flags: real
 No. Variables: 4
@@ -11,7 +11,7 @@ Variables:
 	3	v(vdd)	voltage
 Values:
  0	1.200000000000000e+00
-	-1.140955994973278e-03
-	1.140955994973278e-03
+	-1.140338043519779e-03
+	1.140338043519779e-03
 	1.200000000000000e+00
 

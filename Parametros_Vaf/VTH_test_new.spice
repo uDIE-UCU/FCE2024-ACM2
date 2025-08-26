@@ -7,8 +7,8 @@ V2 Vd GND DC({phi_t*0.5})
 
 
 * Circuit Parameters
-.param vg = 2
-.param step = 0.15325
+.param vg = 3.0
+.param step = 0.01
 .param phi_t = 0.0258
 .param w = 1.0u
 .param l = 1.0u
@@ -28,7 +28,7 @@ let gm_id = deriv(-1*i(V2))/(-1*i(V2))
 setplot dc1
 gnuplot gm_id
 set filetype = ascii
-write dcsweep.raw
+write VTH_sweep.raw
 .endc
 .end
 

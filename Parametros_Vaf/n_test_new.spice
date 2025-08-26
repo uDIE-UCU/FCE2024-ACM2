@@ -9,9 +9,9 @@ N1 Vg Vg Vs GND NMOS_ACM w={w} l={l} m=1
 
 * Circuit Parameters
 .param vs = 3.0
-.param step = 0.15325
+.param step = 0.01
 .param Vdd = 1.2
-.param is = 0.08824409489637315u
+.param is = 12.730892919521022u
 .param w = 1.0u
 .param l = 1.0u
 * Include Models
@@ -28,7 +28,7 @@ run
 setplot dc1
 gnuplot v(Vg)
 set filetype = ascii
-write dcsweep.raw
+write n_sweep.raw
 .endc
 .end
 

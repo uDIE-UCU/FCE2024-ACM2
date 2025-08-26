@@ -24,7 +24,7 @@ pre_osdi PMOS_ACM_2V0.osdi
 run
 print i(Vd)
 set filetype = ascii
-write dcsweep.raw
+write zeta_op.raw
 .endc
 .end
 

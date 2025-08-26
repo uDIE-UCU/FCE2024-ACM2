@@ -2,8 +2,8 @@
 **.subckt sigma_test
 N1 Vd Vg GND GND NMOS_ACM w={w} l={l} m=1
 E1 Vg GND Vd net1 1000
-I0 Vdd Vd 3m
-V1 net1 GND 3
+I0 Vdd Vd {Ibias}
+V1 net1 GND {vd}
 V2 Vdd GND {vdd}
 **** begin user architecture code
 
@@ -11,6 +11,7 @@ V2 Vdd GND {vdd}
 * Circuit Parameters
 .param vd = 3
 .param vdd = 1.2
+.param Ibias = 1m
 .param step = 0.01
 .param w = 5.0u
 .param l = 0.18u
