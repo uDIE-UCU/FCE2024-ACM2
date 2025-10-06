@@ -1,0 +1,60 @@
+** sch_path: /workspaces/usm-vlsi-tools/shared_xserver/Parametros_ALD/VTH_test_v2.sch
+**.subckt VTH_test_v2
+V1 Vg GND {Vg}
+V2 Vd GND DC({phi_t*0.5})
+XM1 Vd Vg GND GND 1106
+**** begin user architecture code
+
+.subckt 1106 1 2 3 4 params: vtn=0.0
+m1 1 2 3 4 ncg l=7.8e-6 w=0.138e-3 as=0.603e-8 ps=0.478e-3 ad=0.161e-8
++                                  nrd=.3 nrs=1
+.ends
+
+.model ncg  nmos  (level=2
++	gamma=1.09 lot/4/uniform=-.22 dev/uniform=.04
++	vto={.750+vtn}    lot/2/uniform=.2   dev/uniform=19e-3
++             Uo=650     lot/3/uniform=40   dev/uniform=5
++             Ucrit=0.7e4 Uexp=.1 Vmax=1.6e5
++             phi=.70 tpg=+1
++             nsub={1e16*ires} neff={10*ires} nss=.7e11 nfs=1.17e11
++             tox={.055u*cox} lot/8/uniform=9.1% dev/uniform=.05%
++             Cgso={.94n*cox} Cgdo={.59n*cox} Cgbo={.138n*pox} Xqc=.42
++             cj=.39m cjsw=264p
++             xj=2.0u 
++	ld=1.6u lot/uniform=.19 dev/uniform=.02 
++	wd=1.05u lot/uniform=.42 dev/uniform=.1
++            	pb=.9 js=20e-6  mj=.5 mjsw=0.18
++             kf=.75e-28 rsh=10 lot/1/uniform=4 dev/uniform=.5)
+
+* Circuit Parameters
+.param vg = 3
+.param step = 0.01
+.param phi_t = 0.0258
+.param: 
+* resistors:  implanted and polysilicon (a multiplier)
++             ires=1.0      pres=1.0   M_dec=1
+* capacitors: poly/gate   interpoly  (a multiplier)
++             Cox=1.0     Pox=1.0 
+* transistors: (input a delta shift of threshold) 
++             Vtn=0.0     Vtp=0.0    Lv=0.0u Wv=0.0u M=1
+* amplifiers: 
++             vos=0.0 
+* zeners: 
++             bvz=5.3
+* OP Parameters & Singals to save
+.save all
+*Simulations
+.dc V1 0 {vg} {step}
+.control
+run
+plot v(vg)
+set filetype = ascii
+write dcsweep_v2.raw
+.endc
+.end
+
+
+**** end user architecture code
+**.ends
+.GLOBAL GND
+.end

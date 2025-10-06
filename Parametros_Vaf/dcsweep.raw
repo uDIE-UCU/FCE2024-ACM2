@@ -1,0 +1,21 @@
+Title: ** sch_path: /workspaces/usm-vlsi-tools/shared_xserver/parametros_vaf/vth_tets.sch
+Date: Sat Oct  4 00:57:22  2025
+Plotname: Operating Point
+Flags: real
+No. Variables: 6
+No. Points: 1
+Variables:
+	0	v(vg)	voltage
+	1	i(@i0[current])	current
+	2	@n1[qd_op]	charge
+	3	@n1[qs_op]	charge
+	4	i(v2)	current
+	5	v(vdd)	voltage
+Values:
+ 0	4.733079788668291e-01
+	9.999999999999897e-06
+	5.330583916922736e-02
+	8.231173403020807e-01
+	-9.999999999999897e-06
+	2.000000000000000e+00
+

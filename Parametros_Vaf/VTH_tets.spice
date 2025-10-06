@@ -1,8 +1,8 @@
 ** sch_path: /workspaces/usm-vlsi-tools/shared_xserver/Parametros_Vaf/VTH_tets.sch
 **.subckt VTH_tets
-N1 Vd Vg GND GND NMOS_ACM w={w} l={l} m=1
-V1 Vg GND {Vg}
-V2 Vd GND DC({phi_t*0.5})
+N1 Vg Vg GND GND NMOS_ACM w=1u l=1u m=1
+V2 Vdd GND DC(2)
+I0 Vdd Vg 1m
 **** begin user architecture code
 
 
@@ -17,18 +17,60 @@ V2 Vd GND DC({phi_t*0.5})
 .model PMOS_ACM pmos_ACM
 * OP Parameters & Singals to save
 .save all
-.save @n1[gm_op]
+.save @n1[qS_op]
+.save @n1[qD_op]
 *Simulations
-.dc V1 0 {vg} {step}
+.op                                 ; simulation type required
 .control
 pre_osdi NMOS_ACM_2V0.osdi
 pre_osdi PMOS_ACM_2V0.osdi
-run
-let gm_id = deriv(-1*i(V2))/(-1*i(V2))
-setplot dc1
-plot gm_id
+let istart = 10p                      ; start voltage vector (in plot 'const')
+let iend = 10u                      ; end voltage vector (in plot 'const')
+let numb = 20                        ; number of points per octave (in plot 'const')
+
+let index = 1                       ; new loop index vector (in plot 'const')
+let imult = 10^(1/numb)              ; multiplicator
+
+let xx = iend/istart                ; find the total number of steps
+let ind1 = 0
+while xx > 1
+  let xx = xx / imult
+  let ind1 = ind1 + 1
+end
+echo number of steps $&ind1
+
+if ind1 < 1                          ; move on when number of steps is positive
+  echo error with number of steps $&ind1 --'>'  stop!
+else
+  let iecx = vector(ind1)            ; create vectors for x and y
+  let qSy = vector(ind1)
+  let qDy = vector(ind1)
+  settype current iecx               ; set the correct vector type
+  settype charge qSy
+  settype charge qDy
+
+  let icur = istart                   ; current voltage value in the loop
+  while icur <= iend                  ; the voltage loop
+    alter I0 icur                     ; a new voltage value for V1
+    echo run no. $&index
+    run                               ; simulate
+    let indloc = index - 1            ; indexes for vectors start with 0
+    let iecx[indloc] = @i0[current]           ; x value into vector
+    let qSy[indloc] = @n1[qS_op]      ; y value into vector
+    let qDy[indloc] = @n1[qD_op]      ; y value into vector
+    print icur @i0[current] @n1[qS_op] @n1[qD_op]
+    unlet indloc                      ; remove vector no longer used
+    echo
+    let icur = icur * imult           ; calculate new voltage value
+    let index = index + 1
+  end
+  plot qSy vs iecx qDy vs iecx xlog    ; plot y versus x
+  set wr_vecnames
+  set wr_singlescale
+  wrdata carga.txt qSy vs iecx qDy vs iecx
+end
+rusage                                ; memory and time used
 set filetype = ascii
-write dcsweep.raw
 .endc
 .end
 

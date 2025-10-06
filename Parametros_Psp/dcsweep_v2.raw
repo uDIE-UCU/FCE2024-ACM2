@@ -1,0 +1,97 @@
+Title: ** sch_path: /workspaces/usm-vlsi-tools/shared_xserver/parametros_psp/zeda_test.sch
+Date: Thu Oct  2 18:51:26  2025
+Plotname: Operating Point
+Flags: real
+No. Variables: 44
+No. Points: 1
+Variables:
+	0	v(vg)	voltage
+	1	i(@n.xm1.nsg13_lv_nmos[ide])	current
+	2	v(n.xm1.nsg13_lv_nmos#bd)	voltage
+	3	v(n.xm1.nsg13_lv_nmos#bi)	voltage
+	4	v(n.xm1.nsg13_lv_nmos#bp)	voltage
+	5	v(n.xm1.nsg13_lv_nmos#bs)	voltage
+	6	v(n.xm1.nsg13_lv_nmos#di)	voltage
+	7	v(n.xm1.nsg13_lv_nmos#gp)	voltage
+	8	v(n.xm1.nsg13_lv_nmos#int1)	voltage
+	9	v(n.xm1.nsg13_lv_nmos#int2)	voltage
+	10	v(n.xm1.nsg13_lv_nmos#int3)	voltage
+	11	v(n.xm1.nsg13_lv_nmos#int4)	voltage
+	12	v(n.xm1.nsg13_lv_nmos#int5)	voltage
+	13	v(n.xm1.nsg13_lv_nmos#int6)	voltage
+	14	v(n.xm1.nsg13_lv_nmos#int7)	voltage
+	15	v(n.xm1.nsg13_lv_nmos#int8)	voltage
+	16	v(n.xm1.nsg13_lv_nmos#int9)	voltage
+	17	v(n.xm1.nsg13_lv_nmos#noi)	voltage
+	18	v(n.xm1.nsg13_lv_nmos#si)	voltage
+	19	v(n.xm1.nsg13_lv_nmos#flow(noii))	voltage
+	20	v(n.xm1.nsg13_lv_nmos#flow(res1))	voltage
+	21	v(n.xm1.nsg13_lv_nmos#flow(res2))	voltage
+	22	v(n.xm1.nsg13_lv_nmos#flow(res3))	voltage
+	23	v(n.xm1.nsg13_lv_nmos#flow(res4))	voltage
+	24	v(n.xm1.nsg13_lv_nmos#flow(res5))	voltage
+	25	v(n.xm1.nsg13_lv_nmos#flow(res6))	voltage
+	26	v(n.xm1.nsg13_lv_nmos#flow(res7))	voltage
+	27	v(n.xm1.nsg13_lv_nmos#flow(res8))	voltage
+	28	v(n.xm1.nsg13_lv_nmos#flow(res9))	voltage
+	29	v(n.xm1.nsg13_lv_nmos#flow(spline1))	voltage
+	30	v(n.xm1.nsg13_lv_nmos#flow(spline2))	voltage
+	31	v(n.xm1.nsg13_lv_nmos#flow(spline3))	voltage
+	32	v(n.xm1.nsg13_lv_nmos#flow(spline4))	voltage
+	33	v(n.xm1.nsg13_lv_nmos#flow(spline5))	voltage
+	34	v(n.xm1.nsg13_lv_nmos#flow(spline6))	voltage
+	35	v(n.xm1.nsg13_lv_nmos#flow(spline7))	voltage
+	36	v(n.xm1.nsg13_lv_nmos#flow(spline8))	voltage
+	37	v(n.xm1.nsg13_lv_nmos#flow(spline9))	voltage
+	38	v(n.xm1.nsg13_lv_nmos#implicit_equation_0)	voltage
+	39	v(n.xm1.nsg13_lv_nmos#implicit_equation_1)	voltage
+	40	v(n.xm1.nsg13_lv_nmos#implicit_equation_2)	voltage
+	41	i(v1)	current
+	42	i(v2)	current
+	43	v(vd)	voltage
+Values:
+ 0	1.200000000000000e+00
+	2.146336853163631e-03
+	-0.000000000000000e+00
+	-0.000000000000000e+00
+	-0.000000000000000e+00
+	-0.000000000000000e+00
+	-0.000000000000000e+00
+	1.199999997762514e+00
+	-0.000000000000000e+00
+	-0.000000000000000e+00
+	-0.000000000000000e+00
+	0.000000000000000e+00
+	0.000000000000000e+00
+	0.000000000000000e+00
+	0.000000000000000e+00
+	0.000000000000000e+00
+	0.000000000000000e+00
+	0.000000000000000e+00
+	-0.000000000000000e+00
+	0.000000000000000e+00
+	0.000000000000000e+00
+	0.000000000000000e+00
+	0.000000000000000e+00
+	0.000000000000000e+00
+	0.000000000000000e+00
+	0.000000000000000e+00
+	-0.000000000000000e+00
+	0.000000000000000e+00
+	0.000000000000000e+00
+	0.000000000000000e+00
+	0.000000000000000e+00
+	0.000000000000000e+00
+	0.000000000000000e+00
+	0.000000000000000e+00
+	0.000000000000000e+00
+	0.000000000000000e+00
+	0.000000000000000e+00
+	0.000000000000000e+00
+	0.000000000000000e+00
+	0.000000000000000e+00
+	0.000000000000000e+00
+	-1.546055783396838e-10
+	-2.146336853164831e-03
+	1.200000000000000e+00
+

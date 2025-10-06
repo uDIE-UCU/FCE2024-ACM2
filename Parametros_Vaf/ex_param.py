@@ -108,10 +108,13 @@ def ex_param(
 
     gm_Id_vaf = gm_vaf / Id
     gm_Id_vaf_max = max(gm_Id_vaf)
+    print(1 / (gm_Id_vaf_max * phi_t))
     nearest_vaf, idx_vaf = find_nearest(gm_Id_vaf, gm_Id_vaf_max / 2)
     err_Vth_vaf = abs(gm_Id_vaf_max / 2 - nearest_vaf)
-    Vth_vaf = find_nearest_2(Vg, gm_Id_vaf, gm_Id_vaf_max / 2)  # Vg[idx_vaf]
-    Ish_vaf = find_nearest_2(Id, gm_Id_vaf, gm_Id_vaf_max / 2) / S  # Id[idx_vaf] / S
+    Vth_vaf = find_nearest_2(Vg, gm_Id_vaf, gm_Id_vaf_max * 0.531)  # Vg[idx_vaf]
+    Ish_vaf = (
+        find_nearest_2(Id, gm_Id_vaf, gm_Id_vaf_max * 0.531) * 0.88
+    )  # Id[idx_vaf] / S
     Is_vaf = 3 * Ish_vaf.real * S * np.power(10, 6)
     Is_list = [Is_vaf]
     if graph:
@@ -173,6 +176,8 @@ def ex_param(
         n_tuple += (n[-1].real,)
         if graph:
             print(f"n={n[-1].real}")
+            plt.plot(Vg_n.real, Vs.real)
+            plt.show()
 
     og_path_sigma = "./Parametros_Vaf/sigma_test.spice"
     dest_path_sigma = "./Parametros_Vaf/sigma_test_new.spice"
@@ -203,6 +208,8 @@ def ex_param(
     data_zeta = spyci.load_raw("zeta_op.raw")
     id = get_values(data_zeta, "i(vd)")[0].real
     qs = solve_qs(Vdd, Vth_vaf.real, sigma, n_tuple[0].real, phi_t)
+    print(f"qs={qs}")
+    print(f"id={id}")
     zeta = solve_zeta(qs, id, Ish_vaf.real).real
 
     if graph:
@@ -226,9 +233,80 @@ def ex_param(
             output += (Vth.real, Ish.real, n_tuple[2])
     if hand and not spice:
         output += (Vth.real, Ish.real, n_tuple[1])
-    output += (sigma, zeta, Id, Vg)
+    output += (sigma, zeta)
     return output
 
 
+def new_sigma(w=1.0, l=1.0, Vg_max=0.5, Vdd=1.2, step=0.01, vd_1=0.05, graph=False):
+    S = w / l
+
+    og_path_VTH = "./Parametros_Vaf/VTH_tets.spice"
+    dest_path_VTH = "./Parametros_Vaf/VTH_test_new.spice"
+    og_params_VTH = ".param vg = 3\n.param step = 0.01\n.param phi_t = 0.0258\n.param w = 5.0u\n.param l = 0.18u"
+    dest_params_VTH = f".param vg = {Vg_max}\n.param step = {step}\n.param phi_t = {vd_1*2}\n.param w = {w}u\n.param l = {l}u"
+
+    run_spice(og_path_VTH, dest_path_VTH, og_params_VTH, dest_params_VTH, "VTH_sweep")
+
+    # Load the raw file
+    data_vth = spyci.load_raw("VTH_sweep.raw")
+
+    Vg = np.array(get_values(data_vth, "v(vg)"))
+    Vd_1 = np.array(get_values(data_vth, "v(vd)"))[0]
+    Id_1 = -np.array(get_values(data_vth, "i(v2)"))
+    lnId_1 = np.log(Id_1)
+    sim_len = len(Vg)
+    n_array = (
+        (1 / 0.026)
+        * (Vg[1:] - Vg[: sim_len - 1])
+        / (lnId_1[1:] - lnId_1[: sim_len - 1])
+    )
+    plt.plot(Vg[1:].real, n_array.real)
+    plt.xlabel("Vg (V)")
+    plt.ylabel("n")
+    plt.title("n vs Vg")
+    plt.show()
+    print(f"n: {min(n_array.real)}")
+
+    for vd in np.arange(0.1, 2.1, 0.1):
+        og_path_VTH = "./Parametros_Vaf/VTH_tets.spice"
+        dest_path_VTH = "./Parametros_Vaf/VTH_test_new.spice"
+        og_params_VTH = ".param vg = 3\n.param step = 0.01\n.param phi_t = 0.0258\n.param w = 5.0u\n.param l = 0.18u"
+        dest_params_VTH = f".param vg = {Vg_max}\n.param step = {step}\n.param phi_t = {2*vd}\n.param w = {w}u\n.param l = {l}u"
+
+        run_spice(
+            og_path_VTH, dest_path_VTH, og_params_VTH, dest_params_VTH, "VTH_sweep"
+        )
+
+        # Load the raw file
+        data_vth = spyci.load_raw("VTH_sweep.raw")
+
+        Vd_2 = np.array(get_values(data_vth, "v(vd)"))[0]
+        Id_2 = -np.array(get_values(data_vth, "i(v2)"))
+
+        idx = (10e-9) * S
+        Vg_1 = find_nearest_2(Vg, Id_1, idx)
+        Vg_2 = find_nearest_2(Vg, Id_2, idx)
+        new_sigma = (Vg_1 - Vg_2) / (Vd_2.real - Vd_1.real)
+        print(
+            f"Nuevo valor de sigma: {new_sigma}, con VD1={Vd_1.real}, VD2={Vd_2.real}"
+        )
+    if graph:
+        print(
+            f"Para un Id de {idx}A, Vg con phi_t=0.0258 es {Vg_1} y con phi_t=0.5 es {Vg_2}"
+        )
+        print(f"Nuevo valor de sigma: {new_sigma}")
+        plt.plot(Vg.real, Id_1.real, label="phi_t=0.0258")
+        plt.plot(Vg.real, Id_2.real, label="phi_t=0.5")
+        plt.yscale("log")
+        plt.xlabel("Vg (V)")
+        plt.ylabel("Id (A)")
+        plt.title("Id vs Vg for different phi_t values")
+        plt.legend()
+        plt.show()
+    return Vg, Id_1, Id_2
+
+
 if __name__ == "__main__":
+    # print(ex_param(Vdd=5))
     ex_param(graph=True)
+    # new_sigma(vd_1=0.05)

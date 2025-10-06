@@ -1,34 +1,33 @@
-** sch_path: /workspaces/usm-vlsi-tools/shared_xserver/Parametros_Vaf/n_test.sch
-**.subckt n_test
-V1 Vs GND {vs}
-V2 net1 GND {Vdd}
-I0 net1 Vg {is}
-N1 Vg Vg Vs GND NMOS_ACM w={w} l={l} m=1
+** sch_path: /workspaces/usm-vlsi-tools/shared_xserver/Parametros_Vaf/VTH_tets.sch
+**.subckt VTH_tets
+N1 Vd Vg GND GND NMOS_ACM w={w} l={l} m=1
+V1 Vg GND {Vg}
+V2 Vd GND DC({phi_t*0.5})
 **** begin user architecture code
 
 
 * Circuit Parameters
-.param vs = 3.0
+.param vg = 3
 .param step = 0.01
-.param Vdd = 1.2
-.param is = 9.870411333818305u
-.param w = 1.0u
-.param l = 1.0u
+.param phi_t = 0.0258
+.param w = 5.0u
+.param l = 0.18u
 * Include Models
 .model NMOS_ACM nmos_ACM
 .model PMOS_ACM pmos_ACM
 * OP Parameters & Singals to save
 .save all
+.save @n.xn1.NMOS_ACM[gm_op]
 *Simulations
-.dc V1 -1 {vs} {step}
+.dc V1 0 {vg} {step}
 .control
 pre_osdi NMOS_ACM_2V0.osdi
 pre_osdi PMOS_ACM_2V0.osdi
 run
 setplot dc1
-gnuplot v(Vg)
+plot -i(V2)
 set filetype = ascii
-write n_sweep.raw
+write dcsweep.raw
 .endc
 .end
 

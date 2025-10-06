@@ -1,0 +1,32 @@
+** sch_path: /workspaces/usm-vlsi-tools/shared_xserver/Parametros_Psp/zeda_test.sch
+**.subckt zeda_test
+V1 Vg GND {vdd}
+V2 Vd GND {vdd}
+XM1 Vd Vg GND GND sg13_lv_nmos w={w} l={l} ng=1 m=1
+**** begin user architecture code
+
+
+* Circuit Parameters
+.param vdd = 1.2
+.param w = 5.0u
+.param l = 0.18u
+* Include Models
+.lib /opt/pdks/ihp-sg13g2/libs.tech/ngspice/models/cornerMOSlv.lib mos_tt
+.lib /opt/pdks/ihp-sg13g2/libs.tech/ngspice/models/cornerMOShv.lib mos_tt
+* OP Parameters & Singals to save
+.save all
+.save @n.xm1.nsg13_lv_nmos[ide]
+*Simulations
+.op
+.control
+run
+set filetype = ascii
+write dcsweep_v2.raw
+.endc
+.end
+
+
+**** end user architecture code
+**.ends
+.GLOBAL GND
+.end
